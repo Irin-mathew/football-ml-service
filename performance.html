@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⚽ Football Performance Analyzer v3.1</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .badge {
+            display: inline-block;
+            background: #4caf50;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.9em;
+            margin-left: 10px;
+            font-weight: bold;
+        }
+
+        .main-content {
+            padding: 40px;
+        }
+
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .section h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .upload-area {
+            border: 3px dashed #667eea;
+            border-radius: 15px;
+            padding: 60px 20px;
+            text-align: center;
+            background: #f8f9ff;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .upload-area:hover {
+            background: #eef1ff;
+            border-color: #764ba2;
+        }
+
+        .upload-area.dragover {
+            background: #e0e7ff;
+            border-color: #667eea;
+            transform: scale(1.02);
+        }
+
+        .upload-icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.1em;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-small {
+            padding: 8px 20px;
+            font-size: 0.9em;
+        }
+
+        .checkbox-container {
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .checkbox-container label {
+            font-size: 1.1em;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .checkbox-container input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background: #f0f0f0;
+            border-radius: 15px;
+            overflow: hidden;
+            margin: 20px 0;
+            display: none;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            width: 0%;
+            transition: width 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .status-message {
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            display: none;
+        }
+
+        .status-message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status-message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .status-message.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        /* Stream Preview */
+        .stream-preview {
+            display: none;
+            margin: 30px 0;
+            border: 2px solid #667eea;
+            border-radius: 15px;
+            overflow: hidden;
+            background: #000;
+        }
+
+        .stream-preview img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .stream-stats {
+            background: #f8f9ff;
+            padding: 15px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+        }
+
+        .stream-stat {
+            text-align: center;
+        }
+
+        .stream-stat-value {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .stream-stat-label {
+            color: #666;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+
+        /* Results Section */
+        .results {
+            display: none;
+        }
+
+        .results-summary {
+            background: #f8f9ff;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .summary-item {
+            text-align: center;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .summary-value {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .summary-label {
+            color: #666;
+            margin-top: 10px;
+        }
+
+        .player-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 25px;
+        }
+
+        .player-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+
+        .player-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            border-color: #667eea;
+        }
+
+        .player-card h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .player-badge {
+            background: #667eea;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.7em;
+        }
+
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .stat-row:last-child {
+            border-bottom: none;
+        }
+
+        .stat-label {
+            font-weight: 600;
+            color: #666;
+        }
+
+        .stat-value {
+            color: #333;
+            font-weight: bold;
+        }
+
+        .stat-highlight {
+            color: #667eea;
+            font-size: 1.1em;
+        }
+
+        .player-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .action-btn {
+            padding: 10px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-card {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-card:hover {
+            background: #5568d3;
+        }
+
+        .btn-heatmap {
+            background: #ff6b6b;
+            color: white;
+        }
+
+        .btn-heatmap:hover {
+            background: #ee5a52;
+        }
+
+        .loading-spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+            display: none;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .video-info {
+            background: #f8f9ff;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            display: none;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+        }
+
+        .info-item {
+            text-align: center;
+        }
+
+        .info-value {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .info-label {
+            color: #666;
+            margin-top: 5px;
+        }
+
+        /* Modal for images */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            padding: 20px;
+        }
+
+        .modal-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            max-height: 90vh;
+            overflow: auto;
+        }
+
+        .modal-content img {
+            width: 100%;
+            height: auto;
+            border-radius: 10px;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            font-size: 35px;
+            color: #666;
+            cursor: pointer;
+            z-index: 1001;
+        }
+
+        .close-modal:hover {
+            color: #000;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>⚽ Football Performance Analyzer <span class="badge">v3.1 FIXED</span></h1>
+            <p>AI-Powered Tracking • Beautiful Ellipses • Referee Occlusion Fixed</p>
+        </div>
+
+        <div class="main-content">
+            <!-- Upload Section -->
+            <div class="section">
+                <h2>📤 Upload Video</h2>
+                <div class="upload-area" id="uploadArea">
+                    <div class="upload-icon">🎬</div>
+                    <p style="font-size: 1.2em; margin-bottom: 10px;">
+                        <strong>Click to browse</strong> or drag and drop your video here
+                    </p>
+                    <p style="color: #666;">Supported formats: MP4, AVI, MOV, MKV</p>
+                    <input type="file" id="fileInput" accept=".mp4,.avi,.mov,.mkv">
+                </div>
+
+                <div class="progress-bar" id="progressBar">
+                    <div class="progress-fill" id="progressFill">0%</div>
+                </div>
+
+                <div id="statusMessage" class="status-message"></div>
+
+                <div class="video-info" id="videoInfo"></div>
+
+                <div class="checkbox-container">
+                    <label>
+                        <input type="checkbox" id="enableStreaming">
+                        <span>🎥 Enable Real-Time Frame Preview (slower but see progress)</span>
+                    </label>
+                </div>
+
+                <div style="text-align: center; margin-top: 20px;">
+                    <button class="btn" id="processBtn" disabled>
+                        🚀 Start Analysis
+                    </button>
+                </div>
+
+                <div class="loading-spinner" id="loadingSpinner"></div>
+            </div>
+
+            <!-- Stream Preview Section -->
+            <div class="section">
+                <div class="stream-preview" id="streamPreview">
+                    <img id="streamImage" alt="Video stream">
+                    <div class="stream-stats" id="streamStats">
+                        <div class="stream-stat">
+                            <div class="stream-stat-value" id="streamFrameCount">0</div>
+                            <div class="stream-stat-label">Frames Received</div>
+                        </div>
+                        <div class="stream-stat">
+                            <div class="stream-stat-value" id="streamFPS">0</div>
+                            <div class="stream-stat-label">Stream FPS</div>
+                        </div>
+                        <div class="stream-stat">
+                            <div class="stream-stat-value" id="streamStatus">Waiting</div>
+                            <div class="stream-stat-label">Status</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Results Section -->
+            <div class="section results" id="resultsSection">
+                <h2>📊 Analysis Results</h2>
+                
+                <div class="results-summary" id="resultsSummary">
+                    <div class="summary-grid" id="summaryGrid"></div>
+                </div>
+
+                <div class="player-grid" id="playerResults"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for viewing images -->
+    <div id="imageModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal()">&times;</span>
+            <img id="modalImage" src="" alt="Player visualization">
+        </div>
+    </div>
+
+    <script>
+        // Configuration
+        const API_URL = 'http://localhost:8000';
+        
+        let sessionId = null;
+        let videoPath = null;
+        let eventSource = null;
+        let statusCheckInterval = null;
+
+        // Elements
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const processBtn = document.getElementById('processBtn');
+        const enableStreaming = document.getElementById('enableStreaming');
+        const progressBar = document.getElementById('progressBar');
+        const progressFill = document.getElementById('progressFill');
+        const statusMessage = document.getElementById('statusMessage');
+        const videoInfo = document.getElementById('videoInfo');
+        const loadingSpinner = document.getElementById('loadingSpinner');
+        const resultsSection = document.getElementById('resultsSection');
+        const resultsSummary = document.getElementById('resultsSummary');
+        const summaryGrid = document.getElementById('summaryGrid');
+        const playerResults = document.getElementById('playerResults');
+        const streamPreview = document.getElementById('streamPreview');
+        const streamImage = document.getElementById('streamImage');
+        const streamFrameCount = document.getElementById('streamFrameCount');
+        const streamFPS = document.getElementById('streamFPS');
+        const streamStatus = document.getElementById('streamStatus');
+        const imageModal = document.getElementById('imageModal');
+        const modalImage = document.getElementById('modalImage');
+
+        // Stream stats
+        let frameCount = 0;
+        let lastFrameTime = Date.now();
+        let fpsHistory = [];
+
+        // Upload area events
+        uploadArea.addEventListener('click', () => fileInput.click());
+
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFile(files[0]);
+            }
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleFile(e.target.files[0]);
+            }
+        });
+
+        processBtn.addEventListener('click', processVideo);
+
+        // Handle file upload
+        async function handleFile(file) {
+            const validTypes = ['video/mp4', 'video/avi', 'video/quicktime', 'video/x-matroska'];
+            if (!validTypes.includes(file.type) && !file.name.match(/\.(mp4|avi|mov|mkv)$/i)) {
+                showMessage('Please upload a valid video file (MP4, AVI, MOV, MKV)', 'error');
+                return;
+            }
+
+            showMessage('Uploading video...', 'info');
+            progressBar.style.display = 'block';
+            updateProgress(10);
+
+            const formData = new FormData();
+            formData.append('video', file);
+
+            try {
+                const response = await fetch(`${API_URL}/api/upload`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                updateProgress(100);
+
+                if (!response.ok) {
+                    throw new Error(`Upload failed: ${response.statusText}`);
+                }
+
+                const data = await response.json();
+                
+                sessionId = data.session_id;
+                videoPath = data.video_path;
+
+                showVideoInfo(data.video_info);
+                processBtn.disabled = false;
+                
+                showMessage(`✅ Upload successful! Video: ${data.filename}`, 'success');
+                progressBar.style.display = 'none';
+
+            } catch (error) {
+                console.error('Upload error:', error);
+                showMessage(`❌ Upload failed: ${error.message}`, 'error');
+                progressBar.style.display = 'none';
+            }
+        }
+
+        // Process video
+        async function processVideo() {
+            if (!sessionId || !videoPath) {
+                showMessage('Please upload a video first', 'error');
+                return;
+            }
+
+            processBtn.disabled = true;
+            loadingSpinner.style.display = 'block';
+            
+            const streaming = enableStreaming.checked;
+            
+            if (streaming) {
+                showMessage('🎬 Processing with real-time preview...', 'info');
+                streamPreview.style.display = 'block';
+                streamStatus.textContent = 'Connecting';
+                frameCount = 0;
+                fpsHistory = [];
+            } else {
+                showMessage('🎬 Processing video... This may take several minutes', 'info');
+            }
+
+            try {
+                const formData = new FormData();
+                formData.append('session_id', sessionId);
+                formData.append('video_path', videoPath);
+                formData.append('use_cache', 'true');
+                formData.append('enable_streaming', streaming);
+
+                const response = await fetch(`${API_URL}/api/process`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.detail || 'Processing failed');
+                }
+
+                const data = await response.json();
+                console.log('Processing started:', data);
+                
+                if (streaming && data.stream_url) {
+                    connectToStream(data.stream_url);
+                }
+                
+                startStatusPolling();
+
+            } catch (error) {
+                console.error('Processing error:', error);
+                showMessage(`❌ Processing failed: ${error.message}`, 'error');
+                loadingSpinner.style.display = 'none';
+                processBtn.disabled = false;
+                streamPreview.style.display = 'none';
+            }
+        }
+
+        // Connect to stream
+        function connectToStream(streamUrl) {
+            const fullUrl = `${API_URL}${streamUrl}`;
+            console.log('Connecting to stream:', fullUrl);
+            
+            eventSource = new EventSource(fullUrl);
+            
+            eventSource.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                
+                if (data.type === 'frame') {
+                    frameCount++;
+                    streamFrameCount.textContent = frameCount;
+                    streamImage.src = 'data:image/jpeg;base64,' + data.data;
+                    streamStatus.textContent = 'Streaming';
+                    
+                    const now = Date.now();
+                    const fps = 1000 / (now - lastFrameTime);
+                    lastFrameTime = now;
+                    fpsHistory.push(fps);
+                    if (fpsHistory.length > 10) fpsHistory.shift();
+                    const avgFps = fpsHistory.reduce((a, b) => a + b, 0) / fpsHistory.length;
+                    streamFPS.textContent = avgFps.toFixed(1);
+                    
+                } else if (data.type === 'end') {
+                    console.log('Stream ended');
+                    streamStatus.textContent = 'Complete';
+                    eventSource.close();
+                } else if (data.type === 'keepalive') {
+                    // Keep connection alive
+                } else if (data.type === 'error') {
+                    console.error('Stream error:', data.message);
+                    streamStatus.textContent = 'Error';
+                    eventSource.close();
+                }
+            };
+            
+            eventSource.onerror = (error) => {
+                console.error('EventSource error:', error);
+                streamStatus.textContent = 'Disconnected';
+                eventSource.close();
+            };
+        }
+
+        // Poll status
+        function startStatusPolling() {
+            statusCheckInterval = setInterval(async () => {
+                try {
+                    const response = await fetch(`${API_URL}/api/status/${sessionId}`);
+                    const data = await response.json();
+                    
+                    console.log('Status:', data.status);
+                    
+                    if (data.status === 'processed') {
+                        clearInterval(statusCheckInterval);
+                        loadingSpinner.style.display = 'none';
+                        
+                        if (eventSource) {
+                            eventSource.close();
+                        }
+                        
+                        // Load results
+                        await loadResults();
+                        
+                    } else if (data.status === 'error') {
+                        clearInterval(statusCheckInterval);
+                        loadingSpinner.style.display = 'none';
+                        showMessage(`❌ Processing error: ${data.error}`, 'error');
+                        processBtn.disabled = false;
+                        
+                        if (eventSource) {
+                            eventSource.close();
+                        }
+                    }
+                } catch (error) {
+                    console.error('Status check error:', error);
+                }
+            }, 2000);
+        }
+
+        // Load results - THE FIX!
+        async function loadResults() {
+            try {
+                console.log('Loading results for session:', sessionId);
+                
+                const response = await fetch(`${API_URL}/api/session/${sessionId}/players`);
+                
+                if (!response.ok) {
+                    throw new Error('Failed to load results');
+                }
+                
+                const data = await response.json();
+                console.log('Results loaded:', data);
+                
+                showMessage(`✅ Analysis complete! Found ${data.total_players} players`, 'success');
+                
+                // Display results
+                displayResults(data.players, data.total_players);
+                
+            } catch (error) {
+                console.error('Results error:', error);
+                showMessage(`✅ Analysis complete! Check console for details.`, 'success');
+            }
+        }
+
+        // Display results
+        function displayResults(players, totalPlayers) {
+            // Show results section
+            resultsSection.style.display = 'block';
+            
+            // Calculate summary stats
+            const validPlayers = players.filter(p => p.stats.total_frames > 30);
+            const totalDistance = validPlayers.reduce((sum, p) => sum + p.stats.total_distance_km, 0);
+            const maxSpeed = Math.max(...validPlayers.map(p => p.stats.max_speed));
+            const totalSprints = validPlayers.reduce((sum, p) => sum + p.stats.sprint_count, 0);
+            
+            // Display summary
+            summaryGrid.innerHTML = `
+                <div class="summary-item">
+                    <div class="summary-value">${validPlayers.length}</div>
+                    <div class="summary-label">Players Tracked</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-value">${totalDistance.toFixed(1)} km</div>
+                    <div class="summary-label">Total Distance</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-value">${maxSpeed.toFixed(1)} km/h</div>
+                    <div class="summary-label">Max Speed</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-value">${totalSprints}</div>
+                    <div class="summary-label">Total Sprints</div>
+                </div>
+            `;
+            
+            // Display player cards
+            playerResults.innerHTML = '';
+            
+            validPlayers.forEach(player => {
+                const card = createPlayerCard(player);
+                playerResults.appendChild(card);
+            });
+            
+            // Scroll to results
+            resultsSection.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Create player card
+        function createPlayerCard(player) {
+            const card = document.createElement('div');
+            card.className = 'player-card';
+            
+            const stats = player.stats;
+            const position = stats.position || 'Unknown';
+            
+            card.innerHTML = `
+                <h3>
+                    Player #${player.player_id}
+                    <span class="player-badge">${position}</span>
+                </h3>
+                
+                <div class="stat-row">
+                    <span class="stat-label">Distance</span>
+                    <span class="stat-value stat-highlight">${stats.total_distance_km} km</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">High Intensity</span>
+                    <span class="stat-value">${stats.high_intensity_distance_km} km</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Max Speed</span>
+                    <span class="stat-value stat-highlight">${stats.max_speed} km/h</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Avg Speed</span>
+                    <span class="stat-value">${stats.avg_speed} km/h</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Sprints</span>
+                    <span class="stat-value">${stats.sprint_count}</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Tracked</span>
+                    <span class="stat-value">${stats.total_frames} frames (${stats.duration_seconds}s)</span>
+                </div>
+                
+                <div class="player-actions">
+                    <button class="action-btn btn-card" onclick="viewPlayerCard(${player.player_id})">
+                        📊 Performance Card
+                    </button>
+                    <button class="action-btn btn-heatmap" onclick="viewHeatmap(${player.player_id})">
+                        🗺️ Heatmap
+                    </button>
+                </div>
+            `;
+            
+            return card;
+        }
+
+        // View player card
+        async function viewPlayerCard(playerId) {
+            try {
+                const url = `${API_URL}/api/player/${playerId}/card?session_id=${sessionId}`;
+                window.open(url, '_blank');
+            } catch (error) {
+                console.error('Card error:', error);
+                alert('Failed to load player card');
+            }
+        }
+
+        // View heatmap
+        async function viewHeatmap(playerId) {
+            try {
+                const url = `${API_URL}/api/player/${playerId}/heatmap?session_id=${sessionId}`;
+                window.open(url, '_blank');
+            } catch (error) {
+                console.error('Heatmap error:', error);
+                alert('Failed to load heatmap');
+            }
+        }
+
+        // Modal functions
+        function closeModal() {
+            imageModal.style.display = 'none';
+        }
+
+        window.onclick = function(event) {
+            if (event.target == imageModal) {
+                closeModal();
+            }
+        }
+
+        // Show video info
+        function showVideoInfo(info) {
+            videoInfo.style.display = 'block';
+            videoInfo.innerHTML = `
+                <div class="info-grid">
+                    <div class="info-item">
+                        <div class="info-value">${info.width}x${info.height}</div>
+                        <div class="info-label">Resolution</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-value">${info.fps.toFixed(1)}</div>
+                        <div class="info-label">FPS</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-value">${info.total_frames}</div>
+                        <div class="info-label">Frames</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-value">${info.duration_seconds.toFixed(1)}s</div>
+                        <div class="info-label">Duration</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Show message
+        function showMessage(message, type) {
+            statusMessage.textContent = message;
+            statusMessage.className = `status-message ${type}`;
+            statusMessage.style.display = 'block';
+        }
+
+        // Update progress
+        function updateProgress(percent) {
+            progressFill.style.width = `${percent}%`;
+            progressFill.textContent = `${percent}%`;
+        }
+
+        // Check API health
+        async function checkAPI() {
+            try {
+                const response = await fetch(`${API_URL}/api/health`);
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('✅ API connected:', data);
+                    showMessage(`✅ Connected to API v${data.version} - Referee fix enabled!`, 'success');
+                    setTimeout(() => statusMessage.style.display = 'none', 3000);
+                } else {
+                    showMessage('⚠️ API server not responding. Make sure to run: python performance_enhanced_v3.py', 'error');
+                }
+            } catch (error) {
+                showMessage('⚠️ Cannot connect to API. Please start the server: python performance_enhanced_v3.py', 'error');
+            }
+        }
+
+        // Check on page load
+        checkAPI();
+    </script>
+</body>
+</html>
