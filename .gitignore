@@ -1,0 +1,127 @@
+# -------------------------
+# Virtual Environments
+# -------------------------
+env/
+venv/
+ENV/
+.Python
+
+# -------------------------
+# Python Cache
+# -------------------------
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# -------------------------
+# Build / Packaging
+# -------------------------
+build/
+dist/
+develop-eggs/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# -------------------------
+# Model Files (Too Large for Git)
+# -------------------------
+models/
+models/weights/
+*.pt
+*.pth
+*.onnx
+*.h5
+*.keras
+*.pkl
+*.joblib
+
+# -------------------------
+# Data Files
+# -------------------------
+*.csv
+*.zip
+*.tar.gz
+*.rar
+
+# -------------------------
+# Videos
+# -------------------------
+*.mp4
+*.avi
+*.mov
+*.mkv
+videos/
+
+# -------------------------
+# Output / Generated Folders
+# -------------------------
+outputs/
+output/
+results/
+debug_frames/
+recovery_cards/
+player_cards/
+heatmaps/
+input/
+
+# -------------------------
+# Logs
+# -------------------------
+*.log
+
+# -------------------------
+# Environment Variables
+# -------------------------
+.env
+.env.local
+
+# -------------------------
+# Jupyter
+# -------------------------
+.ipynb_checkpoints/
+*.ipynb
+
+# -------------------------
+# Testing
+# -------------------------
+.pytest_cache/
+.coverage
+htmlcov/
+
+# -------------------------
+# IDE
+# -------------------------
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# -------------------------
+# OS Files
+# -------------------------
+.DS_Store
+Thumbs.db
+
+# -------------------------
+# Local Utility Scripts (Not for Production)
+# -------------------------
+clear_cache.py
+find_videos.py
+quick_start.py
+run_test_windows.py
+test_analyzer.py
+threaded_analyzer.py
+football_api.py
+improved_injury_predictor.py
