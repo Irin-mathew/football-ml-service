@@ -1,1 +1,31 @@
+# Minimal requirements for Render deployment (CPU-only)
 
+# Core Libraries
+opencv-python-headless==4.8.0.74
+numpy==1.24.3
+scipy==1.11.3
+pillow==10.1.0
+
+# PyTorch CPU (Render auto-selects CPU version)
+torch==2.1.0
+torchvision==0.16.0
+
+# YOLO Detection
+ultralytics==8.3.0
+supervision==0.16.0
+
+# Web Server
+fastapi==0.104.1
+uvicorn==0.24.0
+python-multipart==0.0.6
+
+# Visualization
+matplotlib==3.7.3
+
+# Google Drive
+gdown==4.7.1
+
+# Essential Utils
+pyyaml==6.0.3
+requests==2.31.0
+tqdm==4.66.1
